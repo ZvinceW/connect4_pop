@@ -1,10 +1,8 @@
 module nexys3(
     input clk,
 
-    input btnU,
-    input btnL,
-    input btnD,
-    input btnR,
+    input btnL,     // reset score button
+    input btnR,     // reset game button
 
     input [7:0] JA,
 
@@ -16,26 +14,31 @@ module nexys3(
     output reg [1:0] vgaBlue,
     output Hsync,
     output Vsync
-    );
+);
+
 
 wire [3:0] Decode;
 
-wire leftButton;
-wire rightButton;
-wire upButton;
-wire downButton;
-
-wire hackerman;
+wire leftButton;    // reset score button
+wire rightButton;   // reset game button
 
 wire clock_hz_50;
-wire clock_hz_10;
+wire clock_hz_500;
 
+wire vgaR;
+wire vgaG;
+wire vgaB;
+
+
+// clock divider
+// need special clock for VGA display, seven-segment display, 
 clock_divider _clock_divider(
     .clk(clk),
     .clk_hz_50(clock_hz_50),
-    .clk_hz_10(clock_hz_10)
+    .clk_hz_500(clock_hz_500)
 );
 
+// decoder for PMOD keypad (taken from Digilent PMOD Reference Design https://reference.digilentinc.com/reference/programmable-logic/nexys-3/start)
 decoder C0(
     .clk(clk),
     .Row(JA[7:4]),
@@ -47,8 +50,6 @@ decoder C0(
 debouncers for the following buttons:
     - leftButton
     - rightButton
-    - upButton
-    - downButton 
     - may potentially need for the PMOD buttons? (might need to go in the module above)
 */
 
@@ -56,9 +57,16 @@ debouncers for the following buttons:
 VGA stuff
 */
 
-/*
-game logic
-*/
+// game logic
+connect4 connect4_(
+    .clock(clk),
+    .keypadButton(Decode),
+    .resetGame(btnL),
+    .resetScore(btnR),
+    .vgaR(vgaR),
+    .vgaG(vgaG),
+    .vgaB(vgaB)
+);
 
-
+endmodule
 
