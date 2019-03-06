@@ -25,6 +25,8 @@ wire rightButton;
 wire upButton;
 wire downButton;
 
+wire hackerman;
+
 wire clock_hz_50;
 wire clock_hz_10;
 
