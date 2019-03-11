@@ -26,7 +26,8 @@ module Decoder(
     clk,
     Row,
     Col,
-    DecodeOut
+    DecodeOut,
+	pop_out
     );
 
 // ==============================================================================================
@@ -36,6 +37,8 @@ module Decoder(
     input [3:0] Row;				// Rows on KYPD
     output [3:0] Col;			// Columns on KYPD
     output [3:0] DecodeOut;	// Output data
+	output pop_out;
+	pop_out <= 0;
 
 // ==============================================================================================
 // 							  		Parameters, Regsiters, and Wires
@@ -78,6 +81,7 @@ module Decoder(
 				//R4
 				else if(Row == 4'b1110) begin
 					DecodeOut <= 4'b0000; 		//0
+					pop_out <= 1;
 				end
 				sclk <= sclk + 1'b1;
 			end
