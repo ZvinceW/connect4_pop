@@ -1,7 +1,10 @@
 module connect4(
     input clock,
 
-    input reg [3:0] keypadButton;
+    input [10:0] x_pixel,
+    input [10:0] y_pixel,
+
+    input reg [3:0] keypadButton,
 
     input resetGame,
     input resetScore,

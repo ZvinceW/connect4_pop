@@ -25,6 +25,11 @@ wire rightButton;   // reset game button
 wire clock_hz_50;
 wire clock_hz_500;
 
+
+wire [10:0] x_pixel;
+wire [10:0] y_pixel;
+wire vid_enable;
+
 wire vgaR;
 wire vgaG;
 wire vgaB;
@@ -56,10 +61,27 @@ debouncers for the following buttons:
 /*
 VGA stuff
 */
+reg clr = 0;         //REPLACE WITH DEBOUNCER SIGNAL
+wire hs;
+assign Hsync = ~Hs;  //Hsync output
+wire vs;
+assign Vsync = ~Vs;  //Vsync output
+
+vga_640x480 vga_module(
+    .dclk(clock_hz_50),			//pixel clock: 25MHz
+	.clr(clr),			//asynchronous reset
+	.hsync(hs),		//horizontal sync out
+	.vsync(vs),		//vertical sync out
+	.x_pixel(x_pixel),	//x position of current pixel
+	.y_pixel(y_pixel), //y position of current pixel
+	.vid_enable(vid_enable)     //turn pixel on/off
+)
 
 // game logic
 connect4 connect4_(
     .clock(clk),
+    .x_pixel(x_pixel),
+    .y_pixel(y_pixel),
     .keypadButton(Decode),
     .resetGame(btnL),
     .resetScore(btnR),
