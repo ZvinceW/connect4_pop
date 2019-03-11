@@ -80,7 +80,7 @@ vga_640x480 vga_module(
 )
 
 // game logic
-connect4 connect4_(
+connect4 c4_module(
     .clock(clk),
     .x_pixel(x_pixel),
     .y_pixel(y_pixel),
