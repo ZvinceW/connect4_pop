@@ -83,15 +83,15 @@ integer column;
 integer row;
 
 always @(posedge clk) begin
-    column <= (x_pixel - 110) / 60;
-    row <= (y_pixel) - 60) / 60;
+    column <= (x - 110) / 60;
+    row <= (y - 60) / 60;
 
-    if (x_pixel < 110 || x_pixel > 530 || y_pixel < 60 || y_pixel > 420) begin
+    if (x < 110 || x > 530 || y < 60 || y > 420) begin
         //black border
         R = 3'b000;
         G = 3'b000;
         B = 2'b00;
-    else if (piece[column][5-row] == 1) begin  //draw square pieces
+    else if (piece[column][5-row] == 1 && (y - 60 - row * 30) > 10 && (y - 60 - row * 30) < 50 && (x - 110 - column * 30) > 10 && (x - 110 - column * 30) < 50) begin  //draw square pieces
         // Check piece color
         if (state[column][5-row] == 0) begin
             // yellow piece
