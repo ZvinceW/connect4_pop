@@ -5,6 +5,7 @@ module connect4(
     input [10:0] y_pixel,
 
     input reg [3:0] keypadButton,
+    input pop,
 
     input resetGame,
     input resetScore,
@@ -22,8 +23,8 @@ reg [6:0] piece [5:0];
 reg [6:0] state [5:0];
 reg [6:0] top; // saves how tall column is for every column (from 1 - 6 tall, 0 = none)
 
-reg [3:0] x;
-reg [3:0] y;
+reg [10:0] x = x_pixel;
+reg [10:0] y = y_pixel;
 
 initial begin
     for(x = 0; x < 7; x = x + 1) begin
@@ -53,9 +54,9 @@ always @(posedge clk) begin
                     for(y = 0; y < top[col] - 1; y = y + 1) begin
                         state[col] = state[col +1];
                     end
-                    state[col][top[col] -1] = 0;
-                    piece[col][top[col] -1] = 0;
-                    top[col] = top[col] -1;
+                    state[col][top[col] - 1] = 0;
+                    piece[col][top[col] - 1] = 0;
+                    top[col] = top[col] - 1;
                     player = ~player;
                 end
                 else 
@@ -78,21 +79,21 @@ always @(posedge clk) begin
 
 // display stuff
 
-integer pixelCol;
-integer pixelRow;
+integer column;
+integer row;
 
 always @(posedge clk) begin
-    pixelCol <= (x_pixel - 110) / 60;
-    pixelRow <= (y_pixel) - 60) / 60;
+    column <= (x - 110) / 60;
+    row <= (y - 60) / 60;
 
-    if (PixelX < 110 || PixelX > 530 || PixelY < 60 || PixelY > 420) begin
-        //blue border
+    if (x < 110 || x > 530 || y < 60 || y > 420) begin
+        //black border
         R = 3'b000;
-        G = 3'b101;
-        B = 2'b11;
-    else if (gameStatePIECE[pixelCol][5-pixelRow] == 1) begin  //draw square pieces
+        G = 3'b000;
+        B = 2'b00;
+    else if (piece[column][5-row] == 1 && (y - 60 - row * 30) > 10 && (y - 60 - row * 30) < 50 && (x - 110 - column * 30) > 10 && (x - 110 - column * 30) < 50) begin  //draw square pieces
         // Check piece color
-        if (gameStateSIDE[pixelCol][5-pixelRow] == BLACK) begin
+        if (state[column][5-row] == 0) begin
             // yellow piece
             R = 3'b111;
             G = 3'b111;
@@ -106,16 +107,9 @@ always @(posedge clk) begin
             end
         end
     else begin
-        // Blue default checkerboard
+        //blue gameboard
         R = 3'b000;
-        G = 3'b000;
+        G = 3'b101;
         B = 2'b11;
-        // Highlight column if selected
-        if (pixelCol == currColumn) begin
-            R = 3'b111;
-            G = 3'b111;
-            B = 2'b11;
-            end
-        end
     end
 endmodule
