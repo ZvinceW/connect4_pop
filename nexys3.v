@@ -29,6 +29,7 @@ wire clock_hz_500;
 wire [10:0] x_pixel;
 wire [10:0] y_pixel;
 wire vid_enable;
+wire pop;
 
 wire vgaR;
 wire vgaG;
@@ -48,7 +49,8 @@ decoder C0(
     .clk(clk),
     .Row(JA[7:4]),
     .Col(JA[3:0]),
-    .DecodeOut(Decode)  // the 4-bit representation of the button pressed 1 through F
+    .DecodeOut(Decode),  // the 4-bit representation of the button pressed 1 through F
+    .pop_out(pop)
 );
 
 /* 
@@ -83,6 +85,7 @@ connect4 connect4_(
     .x_pixel(x_pixel),
     .y_pixel(y_pixel),
     .keypadButton(Decode),
+    .pop(pop)
     .resetGame(btnL),
     .resetScore(btnR),
     .vgaR(vgaR),
