@@ -1,13 +1,3 @@
-// score_display score_display_(
-//     .clk(clk),
-//     .num1(), 
-//     .num2(),
-//     .num3(),
-//     .num4(),
-//     .seg(seg),
-//     .an(an)
-// );
-
 module score_display(
     input clk,
 
