@@ -93,5 +93,15 @@ connect4 c4_module(
     .vgaB(vgaB)
 );
 
+// score_display score_display_(
+//     .clk(clk),
+//     .num1(), 
+//     .num2(),
+//     .num3(),
+//     .num4(),
+//     .seg(seg),
+//     .an(an)
+// );
+
 endmodule
 
