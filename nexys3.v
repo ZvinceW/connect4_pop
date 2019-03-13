@@ -6,12 +6,12 @@ module nexys3(
 
     input [7:0] JA,
 
-    output [7:0] seg,
-    output [3:0] an,
+    //output [7:0] seg,
+    //output [3:0] an,
 
-    output reg [2:0] vgaRed,
-    output reg [2:0] vgaGreen,
-    output reg [1:0] vgaBlue,
+    output wire [2:0] vgaRed,
+    output wire [2:0] vgaGreen,
+    output wire [1:0] vgaBlue,
     output Hsync,
     output Vsync
 );
@@ -24,6 +24,7 @@ wire rightButton;   // reset game button
 
 wire clock_hz_50;
 wire clock_hz_500;
+wire clock_hz_25M;
 
 
 wire [10:0] x_pixel;
@@ -35,13 +36,16 @@ wire vgaR;
 wire vgaG;
 wire vgaB;
 
+reg clr = 0;         //REPLACE WITH DEBOUNCER SIGNAL
+
 
 // clock divider
 // need special clock for VGA display, seven-segment display, 
-clock_divider _clock_divider(
+clockdiv _clock_divider(
     .clk(clk),
-    .clk_hz_50(clock_hz_50),
-    .clk_hz_500(clock_hz_500)
+	.clr(clr),
+    .dclk(clock_hz_50),
+    .segclk(clock_hz_500)
 );
 
 // decoder for PMOD keypad (taken from Digilent PMOD Reference Design https://reference.digilentinc.com/reference/programmable-logic/nexys-3/start)
@@ -63,36 +67,45 @@ debouncers for the following buttons:
 /*
 VGA stuff
 */
-reg clr = 0;         //REPLACE WITH DEBOUNCER SIGNAL
-wire hs;
-assign Hsync = ~Hs;  //Hsync output
-wire vs;
-assign Vsync = ~Vs;  //Vsync output
 
-vga_640x480 vga_module(
+wire hs;
+assign Hsync = ~hs;  //Hsync output
+wire vs;
+assign Vsync = ~vs;  //Vsync output
+
+vga640x480 vga_module(
+	//.clk(clock_hz_25M),
+	//.clr(clr),
+	//.hsync(hs),
+	//.vsync(vs),
+	//.PixelX(x_pixel),
+	//.PixelY(y_pixel),
+	//.vidon(vid_enable)
+
     .dclk(clock_hz_50),			//pixel clock: 25MHz
 	.clr(clr),			//asynchronous reset
 	.hsync(hs),		//horizontal sync out
 	.vsync(vs),		//vertical sync out
-	.x_pixel(x_pixel),	//x position of current pixel
-	.y_pixel(y_pixel), //y position of current pixel
-	.vid_enable(vid_enable)     //turn pixel on/off
-)
-
+	.red(vgaRed),	//x position of current pixel
+	.green(vgaGreen), //y position of current pixel
+	.blue(vgaBlue)     //turn pixel on/off
+);
+/*
 // game logic
 connect4 c4_module(
-    .clock(clk),
+    .clk(clk),
+	 .reset(clr),
     .x_pixel(x_pixel),
     .y_pixel(y_pixel),
     .keypadButton(Decode),
-    .pop(pop)
+    .pop(pop),
     .resetGame(btnL),
     .resetScore(btnR),
-    .vgaR(vgaR),
-    .vgaG(vgaG),
-    .vgaB(vgaB)
+    .vgaR(vgaRed),
+    .vgaG(vgaGreen),
+    .vgaB(vgaBlue)
 );
-
+*/
 // score_display score_display_(
 //     .clk(clk),
 //     .num1(), 

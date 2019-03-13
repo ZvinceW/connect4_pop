@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps 
 
-module counter{
+module counter(
     input wire reset,
     input wire player1,
     input wire player2,
@@ -9,7 +9,7 @@ module counter{
     output wire [3:0] sm1,
     output wire [3:0] big2,
     output wire [3:0] sm2
-}
+);
 
 
 reg [3:0] tempBig1 = 4'b0000;
@@ -18,13 +18,13 @@ reg [3:0] tempBig2 = 4'b0000;
 reg [3:0] tempSm2 = 4'b0000;
 
 
-always @(posedge clk or posedge player1 ot posedge player2) 
+always @(posedge clk or posedge player1 or posedge player2) 
 begin
     if (reset) begin
-        tempBig1 = 4'b0000;
-        tempSm1 = 4'b0000;
-        tempBig2 = 4'b0000;
-        tempSm2 = 4'b0000;
+        tempBig1 <= 4'b0000;
+        tempSm1 <= 4'b0000;
+        tempBig2 <= 4'b0000;
+        tempSm2 <= 4'b0000;
     end
 
     else if (  ~reset ) begin

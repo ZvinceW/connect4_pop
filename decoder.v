@@ -22,7 +22,7 @@
 // ==============================================================================================
 // 												Define Module
 // ==============================================================================================
-module Decoder(
+module decoder(
     clk,
     Row,
     Col,
@@ -38,7 +38,7 @@ module Decoder(
     output [3:0] Col;			// Columns on KYPD
     output [3:0] DecodeOut;	// Output data
 	output pop_out;
-	pop_out <= 0;
+	
 
 // ==============================================================================================
 // 							  		Parameters, Regsiters, and Wires
@@ -47,6 +47,7 @@ module Decoder(
 	// Output wires and registers
 	reg [3:0] Col;
 	reg [3:0] DecodeOut;
+	reg pop_out = 0;
 	
 	// Count register
 	reg [19:0] sclk;
