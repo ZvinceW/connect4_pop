@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-/*
+
 module vga_640x480(
 	input wire dclk,			//pixel clock: 25MHz
 	input wire clr,			//asynchronous reset
@@ -105,8 +105,9 @@ begin
 end
 
 endmodule
-*/
 
+
+/*
 module vga640x480(
 	input wire dclk,		//pixel clock: 25MHz
 	input wire clr,			//asynchronous reset
@@ -266,9 +267,10 @@ begin
 end
 
 endmodule
+*/
 
 /*
-module vga_800x600(input wire clk,
+module vga_640x480(input wire clk,
 input wire clr,
 output reg hsync,
 output reg vsync,

@@ -27,7 +27,8 @@ module decoder(
     Row,
     Col,
     DecodeOut,
-	pop_out
+	pop_out,
+	btn_clk
     );
 
 // ==============================================================================================
@@ -38,6 +39,7 @@ module decoder(
     output [3:0] Col;			// Columns on KYPD
     output [3:0] DecodeOut;	// Output data
 	output pop_out;
+	output btn_clk;
 	
 
 // ==============================================================================================
@@ -48,6 +50,7 @@ module decoder(
 	reg [3:0] Col;
 	reg [3:0] DecodeOut;
 	reg pop_out = 0;
+	wire btn_clk;
 	
 	// Count register
 	reg [19:0] sclk;
@@ -57,6 +60,8 @@ module decoder(
 // ==============================================================================================
 
 	always @(posedge clk) begin
+			// DecodeOut <= 4'b1111;
+			// btn_clk <= 0;
 
 			// 1ms
 			if (sclk == 20'b00011000011010100000) begin
@@ -70,10 +75,12 @@ module decoder(
 				//R1
 				if (Row == 4'b0111) begin
 					DecodeOut <= 4'b0001;		//1
+					btn_clk <= 1;
 				end
 				//R2
 				else if(Row == 4'b1011) begin
 					DecodeOut <= 4'b0100; 		//4
+					btn_clk <= 1;
 				end
 				//R3
 				else if(Row == 4'b1101) begin
@@ -82,7 +89,7 @@ module decoder(
 				//R4
 				else if(Row == 4'b1110) begin
 					DecodeOut <= 4'b0000; 		//0
-					pop_out <= 1;
+					btn_clk <= 1;
 				end
 				sclk <= sclk + 1'b1;
 			end
@@ -99,10 +106,12 @@ module decoder(
 				//R1
 				if (Row == 4'b0111) begin
 					DecodeOut <= 4'b0010; 		//2
+					btn_clk <= 1;
 				end
 				//R2
 				else if(Row == 4'b1011) begin
 					DecodeOut <= 4'b0101; 		//5
+					btn_clk <= 1;
 				end
 				//R3
 				else if(Row == 4'b1101) begin
@@ -127,10 +136,12 @@ module decoder(
 				//R1
 				if(Row == 4'b0111) begin
 					DecodeOut <= 4'b0011; 		//3	
+					btn_clk <= 1;
 				end
 				//R2
 				else if(Row == 4'b1011) begin
 					DecodeOut <= 4'b0110; 		//6
+					btn_clk <= 1;
 				end
 				//R3
 				else if(Row == 4'b1101) begin
@@ -156,6 +167,8 @@ module decoder(
 				//R1
 				if(Row == 4'b0111) begin
 					DecodeOut <= 4'b1010; //A
+					pop_out <= 1;
+					btn_clk <= 1;
 				end
 				//R2
 				else if(Row == 4'b1011) begin

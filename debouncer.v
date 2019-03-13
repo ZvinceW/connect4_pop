@@ -1,3 +1,28 @@
+
+`timescale 1ns / 1ps
+
+module debouncer(
+    input clk,
+    input btn_in,
+    output btn_out
+    );
+
+reg [1:0] btn_buffer;
+assign btn_out = btn_buffer[0];
+
+always @(posedge clk or posedge btn_in) begin
+
+    if (btn_in)
+        btn_buffer <= 2'b11;
+    else
+        btn_buffer <= {1'b0, btn_buffer[1]};
+
+end
+
+endmodule
+
+
+/*
 module debouncer(
     input clk, // 500-900 Hz clock?
     input btn,
@@ -21,10 +46,7 @@ always @ (posedge clk)
 	    valid <= 0;
 
 endmodule
-
-
-
-
+*/
 
 
 // Lab 3 Implementation
