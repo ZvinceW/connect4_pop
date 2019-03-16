@@ -5,12 +5,14 @@ module nexys3(
     input btnR,     // reset game button
 	input btnU,
     input btnD,
-    input btnC,    //submit button
+    input btnC,    // submit button
 
-    input [7:0] JA,
+    input [7:0] sw,
 
-    //output [7:0] seg,
-    //output [3:0] an,
+    inout [7:0] JA,
+
+    output [7:0] seg,
+    output [3:0] an,
 
     output reg [2:0] vgaRed,
     output reg [2:0] vgaGreen,
@@ -35,9 +37,9 @@ wire [10:0] y_pixel;
 wire vid_enable;
 wire pop;
 
-wire vgaR;
-wire vgaG;
-wire vgaB;
+wire [2:0] vgaR;
+wire [2:0] vgaG;
+wire [1:0] vgaB;
 
 reg clr = 0;         //REPLACE WITH DEBOUNCER SIGNAL
 
@@ -75,27 +77,27 @@ wire down;
 wire center;
 
 debouncer db_left(
-    .clk(clk),
+    .clk(clock_hz_500),
     .btn_in(btnL),
     .btn_out(left)
 );
 debouncer db_right(
-    .clk(clk),
+    .clk(clock_hz_500),
     .btn_in(btnR),
     .btn_out(right)
 );
 debouncer db_up(
-    .clk(clk),
+    .clk(clock_hz_500),
     .btn_in(btnU),
     .btn_out(up)
 );
 debouncer db_down(
-    .clk(clk),
+    .clk(clock_hz_500),
     .btn_in(btnD),
     .btn_out(down)
 );
 debouncer db_center(
-    .clk(clk),
+    .clk(clock_hz_500),
     .btn_in(btnC),
     .btn_out(center)
 );
@@ -117,14 +119,6 @@ vga_640x480 vga_module(
 	.x_pixel(x_pixel),
 	.y_pixel(y_pixel),
 	.vid_enable(vid_enable)
-
-   //.clk(clock_hz_50),			//pixel clock: 25MHz
-	//.clr(clr),			//asynchronous reset
-	//.hsync(hs),		//horizontal sync out
-	//.vsync(vs),		//vertical sync out
-	//.PixelX(x_pixel),	//x position of current pixel
-	//.PixelY(y_pixel), //y position of current pixel
-	//.vidon(vid_enable)     //turn pixel on/off
 );
 
 // game logic
@@ -140,13 +134,14 @@ connect4 c4_module(
     .resetScore(btnR),
     .vgaR(vgaR),
     .vgaG(vgaG),
-    .vgaB(vgaB)
+    .vgaB(vgaB),
+    .sw(sw)
 );
 
-wire score1big;
-wire score1small;
-wire score2big;
-wire score2small;
+wire [3:0] score1big;
+wire [3:0] score1small;
+wire [3:0] score2big;
+wire [3:0] score2small;
 
 counter score(
 	.reset(left),
@@ -160,7 +155,7 @@ counter score(
 );
 
 score_display score_display_(
-     .clk(clk),
+     .clk(clock_hz_500),
      .num1(score1big),
      .num2(score1small),
      .num3(score2big),
@@ -170,6 +165,7 @@ score_display score_display_(
  );
 
 always @(clock_hz_50) begin
+    
     if (vid_enable) begin
         vgaRed[2:0] = vgaR;
         vgaGreen[2:0] = vgaG;
@@ -180,6 +176,7 @@ always @(clock_hz_50) begin
         vgaGreen[2:0] = 3'b000;
         vgaBlue[1:0] = 2'b00;
     end
+    
 end
 
 

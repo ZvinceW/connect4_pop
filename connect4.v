@@ -16,7 +16,9 @@ module connect4(
 
     output reg [2:0] vgaR,
     output reg [2:0] vgaG,
-    output reg [1:0] vgaB
+    output reg [1:0] vgaB,
+    
+    input [7:0] sw
 );
 //0: Yellow, 1: Red
 
@@ -34,36 +36,45 @@ integer y;
 
 initial begin
     for(x = 0; x < 7; x = x + 1) begin
-        top[x] = 0;
+        top[x] <= 0;
         for(y = 0; y < 6; y = y + 1) begin  
             piece[x][y] <= 0;
-            state[x][y] <= 0;    
+            state[x][y] = 0;    
         end
     end
 end
 
+reg [1:0] det_sub_edge;
+wire sub_edge;
+assign sub_edge = (det_sub_edge == 2'b01);
+always @(posedge clk)
+begin
+	 det_sub_edge <= {det_sub_edge[0], btn_submit};
+end
+
 reg [2:0] save;
 always @(posedge clk) begin
-	 if(btn_submit) begin
-		 if(reset) begin
-			  for(x = 0; x < 7; x = x + 1) begin
-					top[x] <= 0;
-					for(y = 0; y < 6; y = y + 1) begin  
-						 piece[x][y] <= 0;
-						 state[x][y] <= 0;    
-						 player <= 1;
-					end
-			  end
-		 end
-		 else begin
-			  if(pop)begin
+	if(reset) begin
+		for(x = 0; x < 7; x = x + 1) begin
+			top[x] <= 0;
+				for(y = 0; y < 6; y = y + 1) begin  
+					 piece[x][y] <= 0;
+					 state[x][y] = 0;    
+					 player <= 1;
+				end
+		end
+	end
+	if(sub_edge) begin
+		if(sw[0])begin
 					if(col >= 0 && col < 4'b0111)begin
-						 if(state[col][0] == player) begin
-							  save <= top[col] -1;
+						 if(state[col][0] == player ) begin
+							  save = top[col] - 1;
 							  for(y = 0; y < save; y = y + 1) begin
-									state[col] <= state[col +1];
+                                    if(y < 3'b101)begin
+                                        state[col][y] = state[col][y+1];
+                                    end
 							  end
-							  state[col][top[col] - 1] <= 0;
+							  state[col][top[col] - 1] = 0;
 							  piece[col][top[col] - 1] <= 0;
 							  top[col] <= top[col] - 1;
 							  player <= ~player;
@@ -71,18 +82,17 @@ always @(posedge clk) begin
 						 //else  //choose again
 					end
 					//else    //choose again
-			  end
-			  else if( col >= 0 && col < 4'b0111 ) begin
-					if(top[col] < 4'b0110 ) begin
-						 piece[col][top[col]] <= 1;
-						 state[col][top[col]] <= player;
-						 top[col] <= top[col] + 1;
-						 player <= ~player;
-					end
-					//else //choose again
-			  end    
-			  //else //choose again
 		end
+		else if( col >= 0 && col < 4'b0111 ) begin
+			if(top[col] < 4'b0110 ) begin
+				 piece[col][top[col]] <= 1;
+					 state[col][top[col]] = player;
+					 top[col] <= top[col] + 1;
+					 player <= ~player;
+			end
+					//else //choose again
+		end    
+			  //else //choose again
 	end
 end
 // display stuff
@@ -92,21 +102,30 @@ reg [2:0] row;
 
 always @(posedge clk) begin
 	
-    column <= (x_pixel - 110) / 60;
+    column <= (x_pixel - 60) / 60;
     row <= (y_pixel - 60) / 60;
 
-    if (x_pixel < 110 || x_pixel > 530 || y_pixel < 60 || y_pixel > 420) begin
+    if(player == 1 && (x_pixel < 60 && y_pixel < 60)) begin
+        vgaR = 3'b111;
+        vgaG = 3'b000;
+        vgaB = 2'b00;
+    end
+    else if(player == 0 && (x_pixel < 60 && y_pixel < 60)) begin
+        vgaR = 3'b111;
+        vgaG = 3'b111;
+        vgaB = 2'b00;
+    end
+    else if (x_pixel < 60 || x_pixel > 480 || y_pixel < 60 || y_pixel > 420) begin
         //black border
         vgaR = 3'b000;
         vgaG = 3'b000;
         vgaB = 2'b00;
 	 end
     else if (piece[column][5-row] == 1 
-	 /*
-	 && (y_pixel - 60 - row * 30) > 10 
-	 && (y_pixel - 60 - row * 30) < 50 
-	 && (x_pixel - 110 - column * 30) > 10 
-	 && (x_pixel - 110 - column * 30) < 50 */) begin  //draw square pieces
+	 && ((y_pixel - 60 - row * 60) > 10 
+	 && (y_pixel - 60 - row * 60) < 50 
+	 && (x_pixel - 60 - column * 60) > 10 
+	 && (x_pixel - 60 - column * 60) < 50 )) begin  //draw square pieces
         // Check piece color
         if (state[column][5-row] == 0) begin
             // yellow piece
@@ -122,12 +141,11 @@ always @(posedge clk) begin
         end
     end
 	 else if (piece[column][5-row] == 0 
-	 /*
-	 && (y_pixel - 60 - row * 30) > 10 
-	 && (y_pixel - 60 - row * 30) < 50 
-	 && (x_pixel - 110 - column * 30) > 10 
-	 && (x_pixel - 110 - column * 30) < 50 */) begin
-		  vgaR = 3'b000;
+	 && ((y_pixel - 60 - row * 60) > 10 
+	 && (y_pixel - 60 - row * 60) < 50 
+	 && (x_pixel - 60 - column * 60) > 10 
+	 && (x_pixel - 60 - column * 60) < 50 )) begin
+		vgaR = 3'b000;
         vgaG = 3'b000;
         vgaB = 2'b00;
 	 end
